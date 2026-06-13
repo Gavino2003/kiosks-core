@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import pt.ipvc.kiosks.api.dto.UserDto;
 import pt.ipvc.kiosks.bll.services.AuthService;
 import pt.ipvc.kiosks.dal.entities.User;
+import pt.ipvc.kiosks.dal.repository.RoleRepository;
+import pt.ipvc.kiosks.dal.repository.StoreRepository;
 import pt.ipvc.kiosks.dal.repository.UserRepository;
 
 import java.util.List;
@@ -17,26 +19,26 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthApiController {
 
-    @Autowired private AuthService     authService;
+    @Autowired private AuthService    authService;
     @Autowired private UserRepository  userRepository;
+    @Autowired private RoleRepository  roleRepository;
+    @Autowired private StoreRepository storeRepository;
 
-    /** POST /api/auth/login  body: { username, password } */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         User user = authService.login(body.get("username"), body.get("password"));
-        if (user == null) return ResponseEntity.status(401).body("Credenciais inválidas");
+        if (user == null) return ResponseEntity.status(401).body("Invalid credentials");
         UserDto dto = UserDto.from(user);
         dto.roleName = user.getRole() != null ? user.getRole().getRoleName() : null;
         return ResponseEntity.ok(dto);
     }
 
-    /** GET /api/auth/users */
     @GetMapping("/users")
     public List<UserDto> getUsers() {
         return userRepository.findAll().stream().map(UserDto::from).toList();
     }
 
-    /** POST /api/auth/users  body: { username, password, email, roleName, storeId? } */
+    @Transactional
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@RequestBody Map<String, Object> body) {
         try {
@@ -53,7 +55,28 @@ public class AuthApiController {
         }
     }
 
-    /** PATCH /api/auth/users/{id}/active */
+    @Transactional
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id,
+                                         @RequestBody Map<String, Object> body) {
+        return userRepository.findById(id).map(u -> {
+            if (body.containsKey("email"))
+                u.setEmail(body.get("email").toString());
+            if (body.containsKey("roleName"))
+                roleRepository.findByRoleName(body.get("roleName").toString()).ifPresent(u::setRole);
+            if (body.containsKey("storeId")) {
+                Object raw = body.get("storeId");
+                if (raw == null) {
+                    u.setStore(null);
+                } else {
+                    storeRepository.findById(Long.valueOf(raw.toString())).ifPresent(u::setStore);
+                }
+            }
+            return ResponseEntity.ok(UserDto.from(userRepository.save(u)));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @Transactional
     @PatchMapping("/users/{id}/active")
     public ResponseEntity<?> toggleActive(@PathVariable Long id,
             @RequestBody(required = false) Map<String, Boolean> body) {
