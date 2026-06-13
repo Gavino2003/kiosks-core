@@ -77,6 +77,15 @@ public class AuthApiController {
     }
 
     @Transactional
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return userRepository.findById(id).map(u -> {
+            userRepository.delete(u);
+            return ResponseEntity.noContent().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @Transactional
     @PatchMapping("/users/{id}/active")
     public ResponseEntity<?> toggleActive(@PathVariable Long id,
             @RequestBody(required = false) Map<String, Boolean> body) {
