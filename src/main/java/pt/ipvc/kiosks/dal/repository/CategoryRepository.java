@@ -9,5 +9,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findByStoreIdStoreAndActiveTrue(Long idStore);
 
+    List<Category> findByStoreIdStore(Long idStore);
+
     List<Category> findByActiveTrueOrderByCategoryName();
 }

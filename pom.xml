@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>pt.ipvc</groupId>
-    <artifactId>core</artifactId>
+    <artifactId>kiosks-core</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Kiosks Core — Entidades, Repositórios e Serviços</name>
+    <name>Kiosks Core — REST API</name>
 
     <properties>
         <java.version>17</java.version>
@@ -25,6 +25,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -49,10 +53,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                    <mainClass>pt.ipvc.kiosks.KiosksApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>
