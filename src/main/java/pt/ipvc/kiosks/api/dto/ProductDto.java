@@ -32,6 +32,9 @@ public class ProductDto {
             d.categoryId   = p.getCategory().getIdCategory();
             d.categoryName = p.getCategory().getCategoryName();
         }
+        d.storeIds = p.getStoreAssociations().stream()
+                .map(ps -> ps.getStore().getIdStore())
+                .toList();
         return d;
     }
 
