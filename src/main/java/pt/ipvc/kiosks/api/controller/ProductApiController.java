@@ -32,18 +32,19 @@ public class ProductApiController {
     public List<ProductDto> getAll(@RequestParam(required = false) Long storeId,
                                     @RequestParam(required = false) Long categoryId,
                                     @RequestParam(required = false) String q) {
-        if (storeId != null) {
-            List<ProductStore> ps = productStoreRepository.findByStoreIdStoreOrderByProductProductName(storeId)
-                    .stream()
-                    .filter(p -> p.getProduct().getActive())
-                    .filter(p -> categoryId == null || (p.getProduct().getCategory() != null
-                            && p.getProduct().getCategory().getIdCategory().equals(categoryId)))
-                    .filter(p -> q == null || p.getProduct().getProductName().toLowerCase().contains(q.toLowerCase())
-                            || (p.getProduct().getSku() != null && p.getProduct().getSku().toLowerCase().contains(q.toLowerCase())))
-                    .toList();
-            return ps.stream().map(ProductDto::from).toList();
-        }
-        return productService.getAllProductsByStore(null).stream().map(ProductDto::from).toList();
+        List<Product> base = storeId != null
+                ? productStoreRepository.findByStoreIdStoreOrderByProductProductName(storeId)
+                        .stream().map(ProductStore::getProduct).toList()
+                : productRepository.findAll();
+
+        return base.stream()
+                .filter(p -> categoryId == null || (p.getCategory() != null
+                        && p.getCategory().getIdCategory().equals(categoryId)))
+                .filter(p -> q == null || q.isBlank()
+                        || p.getProductName().toLowerCase().contains(q.toLowerCase())
+                        || (p.getSku() != null && p.getSku().toLowerCase().contains(q.toLowerCase())))
+                .map(ProductDto::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
