@@ -27,7 +27,8 @@ public class KiosksApplication {
         SpringApplication.run(KiosksApplication.class, args);
     }
 
-    @Bean
+    // Demo desactivada — core corre como REST API server
+    // @Bean
     CommandLineRunner demo(
             AuthService authService,
             ProductService productService,

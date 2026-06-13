@@ -2,6 +2,7 @@ package pt.ipvc.kiosks.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pt.ipvc.kiosks.api.dto.StoreDto;
 import pt.ipvc.kiosks.dal.entities.Store;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+@Transactional(readOnly = true)
 @RestController
 @RequestMapping("/api/stores")
 public class StoreApiController {

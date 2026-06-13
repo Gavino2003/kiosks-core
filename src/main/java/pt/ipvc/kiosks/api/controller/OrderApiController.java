@@ -2,6 +2,7 @@ package pt.ipvc.kiosks.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pt.ipvc.kiosks.api.dto.OrderDto;
 import pt.ipvc.kiosks.bll.services.OrderService;
@@ -12,6 +13,7 @@ import pt.ipvc.kiosks.dal.repository.OrderRepository;
 import java.util.List;
 import java.util.Map;
 
+@Transactional(readOnly = true)
 @RestController
 @RequestMapping("/api/orders")
 public class OrderApiController {
